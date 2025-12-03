@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stories – La Réunion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <style>
+    :root {
+      --bg: #050816;
+      --text: #f5f5ff;
+      --muted: #b5b8d6;
+      --accent: #ffb347;
+      --radius-xl: 24px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.8);
+      --transition-fast: 0.2s ease-out;
+      --transition-med: 0.3s ease-out;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: #050816;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .app {
+      max-width: 480px;              /* 📱 pensé pour téléphone */
+      margin: 0 auto;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #181c3a, #050816 65%);
+    }
+
+    /* SCROLL VERTICAL TYPE STORIES */
+
+    .stories-wrapper {
+      height: 100vh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    .screen {
+      min-height: 100vh;
+      padding: 18px 16px 24px;
+      scroll-snap-align: start;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ÉCRAN INTRO */
+
+.intro-screen {
+  position: relative;
+  overflow: hidden;
+  background: #000; /* fallback */
+}
+
+/* IMAGE DE FOND PLEIN ÉCRAN */
+.intro-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("photos/Back.png"); /* 🔁 ton image ici */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(0.55) saturate(1.1); /* assombrit un peu pour que le texte reste lisible */
+  z-index: -2;
+}
+
+
+    .intro-bg-glow {
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.09), transparent 55%),
+        radial-gradient(circle at 80% 20%, rgba(255,153,102,0.32), transparent 60%),
+        radial-gradient(circle at 0% 80%, rgba(102,204,255,0.24), transparent 55%);
+      opacity: 0.9;
+      z-index: -1;
+    }
+
+    .intro-topline {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .intro-title {
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .intro-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .intro-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(5,8,22,0.75);
+      font-size: 11px;
+      color: var(--muted);
+      backdrop-filter: blur(10px);
+      margin-bottom: 18px;
+    }
+
+    .intro-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffb347, #ff6b6b);
+    }
+
+    .intro-cta {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      flex: 1;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+      min-height: 40px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffb347, #ff6b6b);
+      color: #11101b;
+      box-shadow: 0 10px 30px rgba(255,120,80,0.7);
+    }
+
+    .btn-primary:active { transform: scale(0.96); }
+
+    .btn-ghost {
+      background: rgba(5,8,22,0.7);
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-ghost:active { transform: scale(0.96); }
+
+    .intro-footer {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      opacity: 0.9;
+    }
+
+    .intro-scroll-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .intro-scroll-hint span {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    /* STORY JOUR */
+
+    .day-screen {
+      position: relative;
+      overflow: hidden;
+      padding-top: 22px;
+      padding-bottom: 20px;
+    }
+
+    .day-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.04), transparent 55%),
+                  radial-gradient(circle at 100% 0%, rgba(255,179,71,0.22), transparent 60%),
+                  radial-gradient(circle at 0% 100%, rgba(96,204,255,0.22), transparent 60%),
+                  #050816;
+      opacity: 0.9;
+      z-index: -2;
+    }
+
+    .day-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(4,5,16,0.95), rgba(4,5,16,0.5), rgba(4,5,16,0.12));
+      z-index: -1;
+    }
+
+    .day-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .day-chip {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .day-number {
+      font-size: 26px;
+      font-weight: 700;
+      opacity: 0.16;
+    }
+
+    .day-main-title {
+      font-size: 18px;
+      font-weight: 650;
+      margin-bottom: 4px;
+    }
+
+    .day-location {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .day-highlight {
+      font-size: 13px;
+      color: rgba(242, 243, 255, 0.96);
+      margin-bottom: 16px;
+    }
+
+    .day-meta-row {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+
+    .badge-soft {
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(255,179,71,0.16);
+      border: 1px solid rgba(255,179,71,0.5);
+      color: #ffd7a4;
+      font-size: 11px;
+    }
+
+    /* HERO AU-DESSUS DE LA GALERIE */
+
+    .day-hero {
+      margin-top: 8px;
+      margin-bottom: 12px;
+      border-radius: 18px;
+      overflow: hidden;
+      height: 210px;
+      background: radial-gradient(circle at top, #111326, #050816 70%);
+      position: relative;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.7);
+    }
+
+    .day-hero-bg {
+      position: absolute;
+      inset: 0;
+      background-position: center;
+      background-size: cover;
+      filter: brightness(0.9) saturate(1.15);
+      transform: scale(1.04);
+      transform-origin: center;
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      opacity: 0;
+    }
+
+    .day-hero-bg.active {
+      opacity: 1;
+      transform: scale(1.0);
+    }
+
+    .day-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(5, 5, 18, 0.9),
+        rgba(5, 5, 18, 0.35),
+        rgba(5,  5, 18, 0.1)
+      );
+    }
+
+    /* GALERIE DE BULLES (MOMENTS) */
+
+    .moments-strip {
+      display: flex;
+      gap: 9px;
+      overflow-x: auto;
+      padding: 6px 2px 4px;
+      margin: 0 -2px;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .moments-strip::-webkit-scrollbar {
+      height: 3px;
+    }
+    .moments-strip::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.25);
+      border-radius: 999px;
+    }
+
+    .moment-chip {
+      flex: 0 0 120px;
+      height: 160px;
+      border-radius: 18px;
+      background-position: center;
+      background-size: cover;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      cursor: pointer;
+      scroll-snap-align: center;
+      transform: translateY(0);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .moment-chip:active {
+      transform: translateY(2px) scale(0.98);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.7);
+    }
+
+    .moment-chip-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(5,5,15,0.9), rgba(5,5,15,0.2));
+    }
+
+    .moment-chip-content {
+      position: absolute;
+      left: 9px;
+      right: 9px;
+      bottom: 9px;
+      font-size: 11px;
+    }
+
+    .moment-chip-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 2px;
+    }
+
+    .moment-chip-title {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .moment-chip-tag {
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--muted);
+      opacity: 0.9;
+    }
+
+    .moment-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,179,71,0.85);
+    }
+
+    .day-footer-hint {
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      opacity: 0.9;
+    }
+
+    /* OVERLAY SCÈNE IMMERSIVE */
+
+    .scene-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: #050816;
+      display: none;
+      flex-direction: column;
+      padding-top: env(safe-area-inset-top, 0);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    .scene-overlay.visible {
+      display: flex;
+    }
+
+    .scene-header {
+      padding: 8px 12px 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to bottom, rgba(4,4,15,0.96), transparent);
+      z-index: 2;
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .scene-header-text {
+      font-size: 12px;
+    }
+
+    .scene-header-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .scene-header-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(5,8,22,0.92);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform var(--transition-fast), background var(--transition-fast);
+    }
+
+    .btn-icon:active { transform: scale(0.95); }
+
+    .scene-body {
+      flex: 1;
+      position: relative;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      cursor: pointer; /* pour rappeler qu'on peut tap */
+    }
+
+    .scene-hero {
+      position: relative;
+      height: 60vh;
+      max-height: 420px;
+      overflow: hidden;
+    }
+
+    .scene-hero-bg {
+      position: absolute;
+      inset: 0;
+      background-position: center;
+      background-size: cover;
+      filter: brightness(0.85) saturate(1.2);
+      transform: scale(1.05);
+      transform-origin: center;
+    }
+
+    .scene-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(4,4,15,0.96), rgba(4,4,15,0.35), rgba(4,4,15,0.05));
+    }
+
+    .scene-hero-label {
+      position: absolute;
+      left: 14px;
+      bottom: 12px;
+      font-size: 11px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(5,5,20,0.9);
+      border: 1px solid rgba(255,255,255,0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scene-hero-label span:last-child {
+      color: var(--muted);
+    }
+
+    .scene-content {
+      padding: 14px 16px 18px;
+      background: radial-gradient(circle at top, #111326, #050816 70%);
+    }
+
+    .scene-title {
+      font-size: 18px;
+      font-weight: 650;
+      margin-bottom: 8px;
+    }
+
+    .scene-text {
+      font-size: 13px;
+      line-height: 1.55;
+      color: rgba(234,235,255,0.96);
+      margin-bottom: 14px;
+    }
+
+    .scene-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .audio-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(5,8,22,0.94);
+      border: 1px solid rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: transform var(--transition-fast), background var(--transition-fast);
+      font-size: 11px;
+    }
+
+    .audio-pill:active { transform: scale(0.96); }
+
+    /* PETIT INDICATEUR EN BAS POUR LE SCROLL GLOBAL */
+
+    .global-indicator {
+      position: fixed;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      font-size: 9px;
+      color: rgba(181,184,214,0.75);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      letter-spacing: 0.18em;
+      opacity: 0.7;
+    }
+
+    @media (min-width: 768px) {
+      .app { max-width: 520px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="global-indicator">SCROLL STORIES</div>
+
+    <main class="stories-wrapper" id="storiesWrapper">
+      <!-- ÉCRAN INTRO -->
+      <section class="screen intro-screen" id="introScreen">
+        <div>
+          <div class="intro-bg-glow"></div>
+          <div class="intro-topline">Carnet de route • La Réunion</div>
+          <h1 class="intro-title">Tes souvenirs, comme des stories à revisiter.</h1>
+          <p class="intro-subtitle">
+            Approche ton téléphone du tableau, et laisse l’île Intense défiler sous ton pouce.
+          </p>
+          <div class="intro-tag">
+            <span class="intro-dot"></span>
+            <span>Optimisé pour iPhone & NFC</span>
+          </div>
+          <div class="intro-cta">
+            <button class="btn btn-primary" id="introStartBtn">Commencer les stories</button>
+            <button class="btn btn-ghost" id="introJumpSecondBtn">Aller au Jour 1</button>
+          </div>
+        </div>
+
+        <div class="intro-footer">
+          <div>
+            <div>Scrolle vers le bas pour parcourir.</div>
+            <div style="opacity:0.8;">Tap sur une scène pour l’ouvrir en plein écran.</div>
+          </div>
+          <div class="intro-scroll-hint">
+            <span>⬇️</span> <small>Stories</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- LES JOURS SERONT INJECTÉS ICI EN JS -->
+      <div id="daysContainer"></div>
+    </main>
+  </div>
+
+  <!-- OVERLAY SCÈNE -->
+  <div class="scene-overlay" id="sceneOverlay">
+    <header class="scene-header">
+      <div class="scene-header-text">
+        <div class="scene-header-title" id="sceneHeaderTitle"></div>
+        <div class="scene-header-sub" id="sceneHeaderSub"></div>
+      </div>
+      <button class="btn-icon" id="sceneCloseBtn" aria-label="Fermer">✕</button>
+    </header>
+    <div class="scene-body" id="sceneBody">
+      <div class="scene-hero">
+        <div class="scene-hero-bg" id="sceneHeroBg"></div>
+        <div class="scene-hero-overlay"></div>
+        <div class="scene-hero-label">
+          <span id="sceneLabelBadge">Instant</span>
+          <span id="sceneLabelTime">Moment</span>
+        </div>
+      </div>
+      <div class="scene-content">
+        <h2 class="scene-title" id="sceneTitle"></h2>
+        <p class="scene-text" id="sceneText"></p>
+        <div class="scene-meta-row">
+          <span id="sceneIndexInfo"></span>
+          <button class="audio-pill" id="sceneAudioBtn" style="display:none;">
+            🔊 Ambiance
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================
+    //   DONNÉES DU VOYAGE
+    // ============================
+
+    const voyageData = {
+      title: "Stories – La Réunion",
+      subtitle: "Une île, des instants, un scroll.",
+      days: [
+        {
+          id: 1,
+          dayLabel: "Jour 1",
+          title: "Premiers pas sur l'Ile Intense",
+          date: "09-11-2025",
+          location: "Saint Gilles les Bains",
+          highlight: "Le choc de la chaleur en sortant de l’avion, et cette sensation d’être très loin de chez toi.",
+          summary: "Tu arrives, tu observes, tu encaisses le climat. Tout est nouveau.",
+          moments: [
+            {
+              label: "Vol",
+              title: "Rien que 11h",
+              text: "Une bouffée de chaleur te saute au visage. Ça sent le kérosène, l’humidité et un peu l’aventure. Tu te dis : ça y est, on y est.",
+              timeOfDay: "Matin",
+              photo: "photos/1/1.jpeg",
+              audio: ""
+            },
+            {
+              label: "Atterrissage",
+              title: "La porte de l’avion s’ouvre",
+              text: "Une bouffée de chaleur te saute au visage. Ça sent le kérosène, l’humidité et un peu l’aventure. Tu te dis : ça y est, on y est.",
+              timeOfDay: "Matin",
+              photo: "photos/1/2.jpeg",
+              audio: ""
+            },
+            {
+              label: "Taxi",
+              title: "Premiers kilomètres",
+              text: "Les palmiers défilent derrière la vitre, les hauteurs se devinent au loin. À la radio, un mélange de créole et de zouk accompagne le trajet.",
+              timeOfDay: "Matin",
+              photo: "photos/1/3.MOV",
+              audio: ""
+            }
+          ]
+        },
+        {
+          id: 2,
+          dayLabel: "Jour 2",
+          title: "Tour de l'île",
+          date: "10-11-2025",
+          location: "Réunion",
+          highlight: "Aujourd'hui tour de l'île.",
+          summary: "L’ouest de l’île te montre sa lumière, son sable et son eau tiède.",
+          moments: [
+            {
+              label: "Lagon",
+              title: "Les pieds dans l’eau",
+              text: "Tu avances, le lagon à la taille, les poissons se faufilent autour de toi. Tu pourrais rester là des heures.",
+              timeOfDay: "Après-midi",
+              photo: "photos/2/1.jpeg",
+              audio: ""
+            },
+            {
+              label: "Lagon",
+              title: "Les pieds dans l’eau",
+              text: "Tu avances, le lagon à la taille, les poissons se faufilent autour de toi. Tu pourrais rester là des heures.",
+              timeOfDay: "Après-midi",
+              photo: "photos/2/2.jpeg",
+              audio: ""
+            },
+            {
+              label: "Lagon",
+              title: "Les pieds dans l’eau",
+              text: "Tu avances, le lagon à la taille, les poissons se faufilent autour de toi. Tu pourrais rester là des heures.",
+              timeOfDay: "Après-midi",
+              photo: "photos/2/3.jpeg",
+              audio: ""
+            },
+            {
+              label: "Lagon",
+              title: "Les pieds dans l’eau",
+              text: "Tu avances, le lagon à la taille, les poissons se faufilent autour de toi. Tu pourrais rester là des heures.",
+              timeOfDay: "Après-midi",
+              photo: "photos/2/4.jpeg",
+              audio: ""
+            },
+            {
+              label: "Lagon",
+              title: "Les pieds dans l’eau",
+              text: "Tu avances, le lagon à la taille, les poissons se faufilent autour de toi. Tu pourrais rester là des heures.",
+              timeOfDay: "Après-midi",
+              photo: "photos/2/5.JPG",
+              audio: ""
+            }
+          ]
+        },
+        {
+          id: 3,
+          dayLabel: "Jour 3",
+          title: "Cap sur le volcan",
+          date: "2024-08-03",
+          location: "Piton de la Fournaise",
+          highlight: "Les virages, la Plaine des Sables, puis ce cratère immense qui te donne l’impression d’être minuscule.",
+          summary: "Tu passes du vert à la roche rouge, jusqu’au bord du cratère.",
+          moments: [
+            {
+              label: "Plaine des Sables",
+              title: "Changer de planète",
+              text: "La route descend dans une cuvette ocre. Plus d’arbres, juste la roche, le vent, et cette impression d’être sur Mars.",
+              timeOfDay: "Matin",
+              photo: "photos/3/1.jpeg",
+              audio: ""
+            },
+            {
+              label: "Bord du cratère",
+              title: "Face au vide",
+              text: "Le vent, le silence et la profondeur du cratère. Tu fixes longtemps l’horizon. Tu sais que ce moment restera.",
+              timeOfDay: "Milieu de journée",
+              photo: "photos/3/2.jpeg",
+              audio: ""
+            }
+          ]
+        },
+        {
+          id: 4,
+          dayLabel: "Jour 4",
+          title: "Encore un jour volcan",
+          date: "2024-08-04",
+          location: "Piton de la Fournaise",
+          highlight: "Les nuages, les cailloux, et toi au milieu.",
+          summary: "Retour au volcan, nouvelle lumière, nouvelles sensations.",
+          moments: [
+            {
+              label: "Roche",
+              title: "Marcher sur la lave",
+              text: "Tu poses tes pas sur ces roches qui ont un jour coulé comme un torrent.",
+              timeOfDay: "Matin",
+              photo: "photos/4/1.jpeg",
+              audio: ""
+            },
+            {
+              label: "Panorama",
+              title: "Tout là-haut",
+              text: "Tu regardes l’horizon, les nuages accrochent les crêtes. Tout paraît loin.",
+              timeOfDay: "Après-midi",
+              photo: "photos/4/2.jpeg",
+              audio: ""
+            }
+          ]
+        },
+        {
+          id: 5,
+          dayLabel: "Jour 5",
+          title: "Dernières lumières",
+          date: "2024-08-05",
+          location: "Côte Ouest",
+          highlight: "Tu savoures les derniers instants, chaque rayon, chaque vague.",
+          summary: "La fin du voyage se rapproche, alors tu regardes tout un peu plus fort.",
+          moments: [
+            {
+              label: "Plage",
+              title: "S’asseoir et regarder",
+              text: "Tu t’installes dans le sable, les pieds vers l’eau, le regard vers le ciel qui change.",
+              timeOfDay: "Soir",
+              photo: "photos/5/1.MOV",
+              audio: ""
+            },
+            {
+              label: "Retour",
+              title: "Une dernière photo",
+              text: "Tu sais que tu vas partir, alors tu prends encore une photo, même si tu en as déjà dix.",
+              timeOfDay: "Soir",
+              photo: "photos/3/2.jpeg",
+              audio: ""
+            },            {
+              label: "Plage",
+              title: "S’asseoir et regarder",
+              text: "Tu t’installes dans le sable, les pieds vers l’eau, le regard vers le ciel qui change.",
+              timeOfDay: "Soir",
+              photo: "photos/5/3.jpeg",
+              audio: ""
+            },            {
+              label: "Plage",
+              title: "S’asseoir et regarder",
+              text: "Tu t’installes dans le sable, les pieds vers l’eau, le regard vers le ciel qui change.",
+              timeOfDay: "Soir",
+              photo: "photos/5/IMG_3308.MOV",
+              audio: ""
+            },
+          ]
+        },
+       {
+          id: 6,
+          dayLabel: "Jour 4",
+          title: "Encore un jour volcan",
+          date: "2024-08-04",
+          location: "Piton de la Fournaise",
+          highlight: "Les nuages, les cailloux, et toi au milieu.",
+          summary: "Retour au volcan, nouvelle lumière, nouvelles sensations.",
+          moments: [
+            {
+              label: "Roche",
+              title: "Marcher sur la lave",
+              text: "Tu poses tes pas sur ces roches qui ont un jour coulé comme un torrent.",
+              timeOfDay: "Matin",
+              photo: "photos/6/1.jpeg",
+              audio: ""
+            }
+          ]
+        },        {
+          id: 7,
+          dayLabel: "Jour 4",
+          title: "Encore un jour volcan",
+          date: "2024-08-04",
+          location: "Piton de la Fournaise",
+          highlight: "Les nuages, les cailloux, et toi au milieu.",
+          summary: "Retour au volcan, nouvelle lumière, nouvelles sensations.",
+          moments: [
+            {
+              label: "Roche",
+              title: "Marcher sur la lave",
+              text: "Tu poses tes pas sur ces roches qui ont un jour coulé comme un torrent.",
+              timeOfDay: "Matin",
+              photo: "photos/7/1.jpeg",
+              audio: ""
+            },
+            {
+              label: "Panorama",
+              title: "Tout là-haut",
+              text: "Tu regardes l’horizon, les nuages accrochent les crêtes. Tout paraît loin.",
+              timeOfDay: "Après-midi",
+              photo: "photos/7/2.jpeg",
+              audio: ""
+            }
+          ]
+        },        {
+          id: 8,
+          dayLabel: "Jour 4",
+          title: "Encore un jour volcan",
+          date: "2024-08-04",
+          location: "Piton de la Fournaise",
+          highlight: "Les nuages, les cailloux, et toi au milieu.",
+          summary: "Retour au volcan, nouvelle lumière, nouvelles sensations.",
+          moments: [
+            {
+              label: "Roche",
+              title: "Marcher sur la lave",
+              text: "Tu poses tes pas sur ces roches qui ont un jour coulé comme un torrent.",
+              timeOfDay: "Matin",
+              photo: "photos/8/1.jpeg",
+              audio: ""
+            },
+            {
+              label: "Panorama",
+              title: "Tout là-haut",
+              text: "Tu regardes l’horizon, les nuages accrochent les crêtes. Tout paraît loin.",
+              timeOfDay: "Après-midi",
+              photo: "photos/4-8/2.jpeg",
+              audio: ""
+            },
+            {
+              label: "Panorama",
+              title: "Tout là-haut",
+              text: "Tu regardes l’horizon, les nuages accrochent les crêtes. Tout paraît loin.",
+              timeOfDay: "Après-midi",
+              photo: "photos/8/3.jpeg",
+              audio: ""
+            }
+          ]
+        },        {
+          id: 9,
+          dayLabel: "Jour 4",
+          title: "Encore un jour volcan",
+          date: "2024-08-04",
+          location: "Piton de la Fournaise",
+          highlight: "Les nuages, les cailloux, et toi au milieu.",
+          summary: "Retour au volcan, nouvelle lumière, nouvelles sensations.",
+          moments: [
+            {
+              label: "Roche",
+              title: "Marcher sur la lave",
+              text: "Tu poses tes pas sur ces roches qui ont un jour coulé comme un torrent.",
+              timeOfDay: "Matin",
+              photo: "photos/4/1.jpeg",
+              audio: ""
+            },
+            {
+              label: "Panorama",
+              title: "Tout là-haut",
+              text: "Tu regardes l’horizon, les nuages accrochent les crêtes. Tout paraît loin.",
+              timeOfDay: "Après-midi",
+              photo: "photos/4/2.jpeg",
+              audio: ""
+            }
+          ]
+        },        {
+          id: 10,
+          dayLabel: "Jour 4",
+          title: "Encore un jour volcan",
+          date: "2024-08-04",
+          location: "Piton de la Fournaise",
+          highlight: "Les nuages, les cailloux, et toi au milieu.",
+          summary: "Retour au volcan, nouvelle lumière, nouvelles sensations.",
+          moments: [
+            {
+              label: "Roche",
+              title: "Marcher sur la lave",
+              text: "Tu poses tes pas sur ces roches qui ont un jour coulé comme un torrent.",
+              timeOfDay: "Matin",
+              photo: "photos/10/1.jpeg",
+              audio: ""
+            },
+            {
+              label: "Panorama",
+              title: "Tout là-haut",
+              text: "Tu regardes l’horizon, les nuages accrochent les crêtes. Tout paraît loin.",
+              timeOfDay: "Après-midi",
+              photo: "photos/4/2.jpeg",
+              audio: ""
+            }
+          ]
+        }
+      ]
+    };
+
+    // ============================
+    //   UTILS
+    // ============================
+
+    function formatDate(dateStr) {
+      // gère "2024-08-03" et "09-11-2025"
+      const iso = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      const fr = dateStr.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+      let d;
+      if (iso) {
+        d = new Date(dateStr);
+      } else if (fr) {
+        d = new Date(`${fr[3]}-${fr[2]}-${fr[1]}`);
+      } else {
+        d = new Date(dateStr);
+      }
+      if (Number.isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+    }
+
+    const daysContainerEl = document.getElementById("daysContainer");
+    const storiesWrapperEl = document.getElementById("storiesWrapper");
+
+    const sceneOverlayEl = document.getElementById("sceneOverlay");
+    const sceneCloseBtn = document.getElementById("sceneCloseBtn");
+    const sceneHeaderTitleEl = document.getElementById("sceneHeaderTitle");
+    const sceneHeaderSubEl = document.getElementById("sceneHeaderSub");
+    const sceneHeroBgEl = document.getElementById("sceneHeroBg");
+    const sceneLabelBadgeEl = document.getElementById("sceneLabelBadge");
+    const sceneLabelTimeEl = document.getElementById("sceneLabelTime");
+    const sceneTitleEl = document.getElementById("sceneTitle");
+    const sceneTextEl = document.getElementById("sceneText");
+    const sceneIndexInfoEl = document.getElementById("sceneIndexInfo");
+    const sceneAudioBtn = document.getElementById("sceneAudioBtn");
+    const sceneBodyEl = document.getElementById("sceneBody");
+
+    let currentAudio = null;
+    let currentDayIndex = null;
+    let currentMomentIndex = null;
+
+    // ============================
+    //   RENDER DES JOURS & MOMENTS
+    // ============================
+
+    function renderDays() {
+      voyageData.days.forEach((day, dayIndex) => {
+        const section = document.createElement("section");
+        section.className = "screen day-screen";
+        section.dataset.dayId = day.id;
+
+        section.innerHTML = `
+          <div class="day-bg"></div>
+          <div class="day-overlay"></div>
+          <div>
+            <div class="day-header-top">
+              <div class="day-chip">${day.dayLabel} • ${formatDate(day.date)}</div>
+              <div class="day-number">${(dayIndex + 1).toString().padStart(2, "0")}</div>
+            </div>
+            <div class="day-main-title">${day.title}</div>
+            <div class="day-location">${day.location}</div>
+            <p class="day-highlight">${day.highlight}</p>
+            <div class="day-meta-row">
+              <span>${day.summary}</span>
+              <span class="badge-soft">${day.moments.length} instant(s)</span>
+            </div>
+          </div>
+
+          <!-- HERO AU-DESSUS DE LA GALERIE -->
+          <div class="day-hero">
+            <div class="day-hero-overlay"></div>
+          </div>
+
+          <div>
+            <div class="moments-strip">
+              ${day.moments
+                .map((m, idx) => {
+                  const bg = m.photo ? `background-image:url('${m.photo}')` : "";
+                  return `
+                    <article class="moment-chip" data-day-id="${day.id}" data-moment-index="${idx}" style="${bg}">
+                      <div class="moment-chip-overlay"></div>
+                      <div class="moment-chip-content">
+                        <div class="moment-chip-label">${m.label}</div>
+                        <div class="moment-chip-title">${m.title}</div>
+                        <div class="moment-chip-tag">
+                          <span class="moment-dot"></span>
+                          <span>${m.timeOfDay || "Instant"}</span>
+                        </div>
+                      </div>
+                    </article>
+                  `;
+                })
+                .join("")}
+            </div>
+            <div class="day-footer-hint">
+              <span>Swipe horizontal pour explorer les instants.</span>
+              <span>Tap pour ouvrir en plein écran.</span>
+            </div>
+          </div>
+        `;
+
+        // HERO SLIDESHOW (on évite les .mov/.mp4)
+        const heroEl = section.querySelector(".day-hero");
+        const validPhotos = day.moments.filter((m) => {
+          if (!m.photo) return false;
+          const lower = m.photo.toLowerCase();
+          return !lower.endsWith(".mov") && !lower.endsWith(".mp4");
+        });
+
+        if (heroEl && validPhotos.length > 0) {
+          validPhotos.forEach((m, index) => {
+            const bg = document.createElement("div");
+            bg.className = "day-hero-bg" + (index === 0 ? " active" : "");
+            bg.style.backgroundImage = `url('${m.photo}')`;
+            heroEl.insertBefore(bg, heroEl.querySelector(".day-hero-overlay"));
+          });
+
+          let slideshowIndex = 0;
+          const slides = heroEl.querySelectorAll(".day-hero-bg");
+
+          if (slides.length > 1) {
+            setInterval(() => {
+              slides[slideshowIndex].classList.remove("active");
+              slideshowIndex = (slideshowIndex + 1) % slides.length;
+              slides[slideshowIndex].classList.add("active");
+            }, 15000); // 15 secondes
+          }
+        }
+
+        daysContainerEl.appendChild(section);
+      });
+
+      // Ajout listeners sur les chips
+      daysContainerEl.querySelectorAll(".moment-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          const dayId = parseInt(chip.getAttribute("data-day-id"), 10);
+          const index = parseInt(chip.getAttribute("data-moment-index"), 10);
+          openScene(dayId, index);
+        });
+      });
+    }
+
+    // ============================
+    //   SCÈNE IMMERSIVE + NAV IG
+    // ============================
+
+    function renderCurrentScene() {
+      if (currentDayIndex === null || currentMomentIndex === null) return;
+      const day = voyageData.days[currentDayIndex];
+      const moment = day.moments[currentMomentIndex];
+      if (!day || !moment) return;
+
+      // header
+      sceneHeaderTitleEl.textContent = day.title;
+      sceneHeaderSubEl.textContent = `${day.location} • ${formatDate(day.date)}`;
+
+      // hero
+      sceneHeroBgEl.style.backgroundImage = moment.photo
+        ? `url('${moment.photo}')`
+        : "";
+      sceneLabelBadgeEl.textContent = moment.label;
+      sceneLabelTimeEl.textContent = moment.timeOfDay || "Instant";
+
+      // contenu
+      sceneTitleEl.textContent = moment.title;
+      sceneTextEl.textContent = moment.text;
+      sceneIndexInfoEl.textContent = `${currentMomentIndex + 1} / ${day.moments.length} instants`;
+
+      // audio
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+      }
+      if (moment.audio) {
+        sceneAudioBtn.style.display = "inline-flex";
+        sceneAudioBtn.textContent = "🔊 Ambiance";
+        sceneAudioBtn.onclick = () => {
+          if (!currentAudio) {
+            currentAudio = new Audio(moment.audio);
+          }
+          if (currentAudio.paused) {
+            currentAudio.play();
+            sceneAudioBtn.textContent = "⏸️ Pause ambiance";
+          } else {
+            currentAudio.pause();
+            sceneAudioBtn.textContent = "🔊 Ambiance";
+          }
+        };
+      } else {
+        sceneAudioBtn.style.display = "none";
+        sceneAudioBtn.onclick = null;
+      }
+
+      const body = sceneBodyEl;
+      body.scrollTo({ top: 0, behavior: "instant" });
+    }
+
+    function openScene(dayId, momentIndex) {
+      const dayIndex = voyageData.days.findIndex((d) => d.id === dayId);
+      if (dayIndex === -1) return;
+
+      currentDayIndex = dayIndex;
+      currentMomentIndex = momentIndex;
+
+      renderCurrentScene();
+      sceneOverlayEl.classList.add("visible");
+    }
+
+    function closeScene() {
+      sceneOverlayEl.classList.remove("visible");
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+      }
+      currentDayIndex = null;
+      currentMomentIndex = null;
+    }
+
+    function goNextMoment() {
+      if (currentDayIndex === null || currentMomentIndex === null) return;
+      const day = voyageData.days[currentDayIndex];
+      if (currentMomentIndex < day.moments.length - 1) {
+        currentMomentIndex += 1;
+        renderCurrentScene();
+      } else {
+        // dernière scène → on ferme (comme si story terminée)
+        closeScene();
+      }
+    }
+
+    function goPrevMoment() {
+      if (currentDayIndex === null || currentMomentIndex === null) return;
+      if (currentMomentIndex > 0) {
+        currentMomentIndex -= 1;
+        renderCurrentScene();
+      }
+      // si on est déjà à 0, on ne fait rien (IG reste sur la première)
+    }
+
+    sceneCloseBtn.addEventListener("click", closeScene);
+    sceneOverlayEl.addEventListener("click", (e) => {
+      if (e.target === sceneOverlayEl) {
+        closeScene();
+      }
+    });
+
+    // 👉 Navigation type Instagram : tap gauche/droite
+    sceneBodyEl.addEventListener("click", (e) => {
+      // on ignore les clics sur les boutons (audio, close, etc.)
+      if (e.target.closest("button") || e.target.closest("a")) return;
+
+      const rect = sceneBodyEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+
+      if (x > rect.width / 2) {
+        // droite → suivant
+        goNextMoment();
+      } else {
+        // gauche → précédent
+        goPrevMoment();
+      }
+    });
+
+    // ============================
+    //   INTRO CTA
+    // ============================
+
+    const introStartBtn = document.getElementById("introStartBtn");
+    const introJumpSecondBtn = document.getElementById("introJumpSecondBtn");
+
+    introStartBtn.addEventListener("click", () => {
+      const firstDayScreen = daysContainerEl.querySelector(".day-screen");
+      if (firstDayScreen) {
+        firstDayScreen.scrollIntoView({ behavior: "smooth" });
+      }
+    });
+
+    introJumpSecondBtn.addEventListener("click", () => {
+      const firstDayScreen = daysContainerEl.querySelector(".day-screen");
+      if (firstDayScreen) {
+        firstDayScreen.scrollIntoView({ behavior: "smooth" });
+      }
+    });
+
+    // ============================
+    //   INIT
+    // ============================
+
+    renderDays();
+  </script>
+</body>
+</html>
