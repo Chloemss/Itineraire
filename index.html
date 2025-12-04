@@ -1,9 +1,19 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <title>Stories – La Réunion</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <!-- Mobile & plein écran plus fiable -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!-- iOS "web app" (si ajoutée à l'écran d'accueil) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Stories Réunion">
+
   <style>
     :root {
       --bg: #050816;
@@ -18,11 +28,14 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html, body { height: 100%; }
+    html, body {
+      height: 100%;
+      scroll-behavior: smooth;
+    }
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-      background: #050816;
+      background: var(--bg);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
@@ -31,14 +44,17 @@
     .app {
       max-width: 480px;              /* 📱 pensé pour téléphone */
       margin: 0 auto;
-      min-height: 100vh;
+      min-height: 100svh;
       background: radial-gradient(circle at top, #181c3a, #050816 65%);
+      padding-top: env(safe-area-inset-top, 0);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      position: relative;
     }
 
     /* SCROLL VERTICAL TYPE STORIES */
 
     .stories-wrapper {
-      height: 100vh;
+      min-height: 100svh;
       overflow-y: auto;
       scroll-snap-type: y mandatory;
       -webkit-overflow-scrolling: touch;
@@ -46,7 +62,7 @@
     }
 
     .screen {
-      min-height: 100vh;
+      min-height: 100svh;
       padding: 18px 16px 24px;
       scroll-snap-align: start;
       position: relative;
@@ -55,27 +71,43 @@
       justify-content: space-between;
     }
 
+    /* ANIMATIONS LÉGÈRES */
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%      { transform: scale(1.3); opacity: 0.5; }
+    }
+
+    @keyframes bounce-arrow {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(4px); }
+    }
+
     /* ÉCRAN INTRO */
 
-.intro-screen {
-  position: relative;
-  overflow: hidden;
-  background: #000; /* fallback */
-}
+    .intro-screen {
+      position: relative;
+      overflow: hidden;
+      background: #000; /* fallback */
+    }
 
-/* IMAGE DE FOND PLEIN ÉCRAN */
-.intro-screen::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("photos/Back.png"); /* 🔁 ton image ici */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: brightness(0.55) saturate(1.1); /* assombrit un peu pour que le texte reste lisible */
-  z-index: -2;
-}
-
+    /* IMAGE DE FOND PLEIN ÉCRAN */
+    .intro-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("photos/Back.png"); /* ton image */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: brightness(0.55) saturate(1.1);
+      z-index: -2;
+    }
 
     .intro-bg-glow {
       position: absolute;
@@ -88,6 +120,10 @@
       z-index: -1;
     }
 
+    .intro-inner {
+      animation: fade-up 0.7s ease-out;
+    }
+
     .intro-topline {
       font-size: 11px;
       letter-spacing: 0.22em;
@@ -97,16 +133,19 @@
     }
 
     .intro-title {
-      font-size: 24px;
+      font-size: 26px;
       line-height: 1.2;
       font-weight: 700;
       margin-bottom: 8px;
+      text-shadow: 0 8px 30px rgba(0,0,0,0.7);
     }
 
     .intro-subtitle {
       font-size: 13px;
       color: var(--muted);
       margin-bottom: 16px;
+      max-width: 95%;
+      text-shadow: 0 6px 20px rgba(0,0,0,0.7);
     }
 
     .intro-tag {
@@ -115,11 +154,11 @@
       gap: 6px;
       padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(5,8,22,0.75);
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(5,8,22,0.85);
       font-size: 11px;
       color: var(--muted);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       margin-bottom: 18px;
     }
 
@@ -128,6 +167,7 @@
       height: 7px;
       border-radius: 999px;
       background: linear-gradient(135deg, #ffb347, #ff6b6b);
+      animation: pulse-dot 1.4s infinite;
     }
 
     .intro-cta {
@@ -148,7 +188,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), opacity 0.2s;
       min-height: 40px;
       white-space: nowrap;
     }
@@ -159,7 +199,7 @@
       box-shadow: 0 10px 30px rgba(255,120,80,0.7);
     }
 
-    .btn-primary:active { transform: scale(0.96); }
+    .btn-primary:active { transform: scale(0.96); opacity: 0.9; }
 
     .btn-ghost {
       background: rgba(5,8,22,0.7);
@@ -168,7 +208,7 @@
       backdrop-filter: blur(10px);
     }
 
-    .btn-ghost:active { transform: scale(0.96); }
+    .btn-ghost:active { transform: scale(0.96); opacity: 0.9; }
 
     .intro-footer {
       font-size: 11px;
@@ -177,7 +217,8 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      opacity: 0.9;
+      opacity: 0.95;
+      text-shadow: 0 6px 20px rgba(0,0,0,0.7);
     }
 
     .intro-scroll-hint {
@@ -189,6 +230,7 @@
     .intro-scroll-hint span {
       font-size: 18px;
       line-height: 1;
+      animation: bounce-arrow 1.5s infinite;
     }
 
     /* STORY JOUR */
@@ -348,12 +390,18 @@
       cursor: pointer;
       scroll-snap-align: center;
       transform: translateY(0);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity 0.2s;
+    }
+
+    .moment-chip:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 32px rgba(0,0,0,0.8);
     }
 
     .moment-chip:active {
       transform: translateY(2px) scale(0.98);
       box-shadow: 0 6px 18px rgba(0,0,0,0.7);
+      opacity: 0.9;
     }
 
     .moment-chip-overlay {
@@ -397,6 +445,24 @@
       height: 6px;
       border-radius: 999px;
       background: rgba(255,179,71,0.85);
+    }
+
+    .moment-video-pill {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.7);
+      font-size: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #fdfdfd;
+    }
+
+    .moment-video-pill span {
+      font-size: 11px;
     }
 
     .day-footer-hint {
@@ -452,6 +518,29 @@
       color: var(--muted);
     }
 
+    .scene-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .scene-progress {
+      position: relative;
+      width: 80px;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      overflow: hidden;
+    }
+
+    .scene-progress-bar {
+      position: absolute;
+      inset: 0;
+      width: 0%;
+      background: linear-gradient(135deg, #ffb347, #ff6b6b);
+      transition: width 0.3s ease-out;
+    }
+
     .btn-icon {
       width: 32px;
       height: 32px;
@@ -463,10 +552,10 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform var(--transition-fast), background var(--transition-fast);
+      transition: transform var(--transition-fast), background var(--transition-fast), opacity 0.2s;
     }
 
-    .btn-icon:active { transform: scale(0.95); }
+    .btn-icon:active { transform: scale(0.95); opacity: 0.9; }
 
     .scene-body {
       flex: 1;
@@ -552,13 +641,13 @@
       background: rgba(5,8,22,0.94);
       border: 1px solid rgba(255,255,255,0.3);
       cursor: pointer;
-      transition: transform var(--transition-fast), background var(--transition-fast);
+      transition: transform var(--transition-fast), background var(--transition-fast), opacity 0.2s;
       font-size: 11px;
     }
 
-    .audio-pill:active { transform: scale(0.96); }
+    .audio-pill:active { transform: scale(0.96); opacity: 0.9; }
 
-    /* PETIT INDICATEUR EN BAS POUR LE SCROLL GLOBAL */
+    /* INDICATEUR GLOBAL */
 
     .global-indicator {
       position: fixed;
@@ -572,6 +661,7 @@
       text-orientation: mixed;
       letter-spacing: 0.18em;
       opacity: 0.7;
+      pointer-events: none;
     }
 
     @media (min-width: 768px) {
@@ -586,7 +676,7 @@
     <main class="stories-wrapper" id="storiesWrapper">
       <!-- ÉCRAN INTRO -->
       <section class="screen intro-screen" id="introScreen">
-        <div>
+        <div class="intro-inner">
           <div class="intro-bg-glow"></div>
           <div class="intro-topline">Carnet de route • La Réunion</div>
           <h1 class="intro-title">Tes souvenirs, comme des stories à revisiter.</h1>
@@ -626,7 +716,12 @@
         <div class="scene-header-title" id="sceneHeaderTitle"></div>
         <div class="scene-header-sub" id="sceneHeaderSub"></div>
       </div>
-      <button class="btn-icon" id="sceneCloseBtn" aria-label="Fermer">✕</button>
+      <div class="scene-header-right">
+        <div class="scene-progress">
+          <div class="scene-progress-bar" id="sceneProgressBar"></div>
+        </div>
+        <button class="btn-icon" id="sceneCloseBtn" aria-label="Fermer">✕</button>
+      </div>
     </header>
     <div class="scene-body" id="sceneBody">
       <div class="scene-hero">
@@ -637,7 +732,8 @@
           <span id="sceneLabelTime">Moment</span>
         </div>
       </div>
-      <div class="scene-content">
+      <div class="
+scene-content">
         <h2 class="scene-title" id="sceneTitle"></h2>
         <p class="scene-text" id="sceneText"></p>
         <div class="scene-meta-row">
@@ -823,24 +919,26 @@
               timeOfDay: "Soir",
               photo: "photos/3/2.jpeg",
               audio: ""
-            },            {
+            },
+            {
               label: "Plage",
               title: "S’asseoir et regarder",
               text: "Tu t’installes dans le sable, les pieds vers l’eau, le regard vers le ciel qui change.",
               timeOfDay: "Soir",
               photo: "photos/5/3.jpeg",
               audio: ""
-            },            {
+            },
+            {
               label: "Plage",
               title: "S’asseoir et regarder",
               text: "Tu t’installes dans le sable, les pieds vers l’eau, le regard vers le ciel qui change.",
               timeOfDay: "Soir",
               photo: "photos/5/4.mp4",
               audio: ""
-            },
+            }
           ]
         },
-       {
+        {
           id: 6,
           dayLabel: "Jour 4",
           title: "Encore un jour volcan",
@@ -858,7 +956,8 @@
               audio: ""
             }
           ]
-        },        {
+        },
+        {
           id: 7,
           dayLabel: "Jour 4",
           title: "Encore un jour volcan",
@@ -884,7 +983,8 @@
               audio: ""
             }
           ]
-        },        {
+        },
+        {
           id: 8,
           dayLabel: "Jour 4",
           title: "Encore un jour volcan",
@@ -918,7 +1018,8 @@
               audio: ""
             }
           ]
-        },        {
+        },
+        {
           id: 9,
           dayLabel: "Jour 4",
           title: "Encore un jour volcan",
@@ -944,7 +1045,8 @@
               audio: ""
             }
           ]
-        },        {
+        },
+        {
           id: 10,
           dayLabel: "Jour 4",
           title: "Encore un jour volcan",
@@ -979,9 +1081,8 @@
     // ============================
 
     function formatDate(dateStr) {
-      // gère "2024-08-03" et "09-11-2025"
       const iso = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      const fr = dateStr.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+      const fr  = dateStr.match(/^(\d{2})-(\d{2})-(\d{4})$/);
       let d;
       if (iso) {
         d = new Date(dateStr);
@@ -994,21 +1095,20 @@
       return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
     }
 
-    const daysContainerEl = document.getElementById("daysContainer");
-    const storiesWrapperEl = document.getElementById("storiesWrapper");
-
-    const sceneOverlayEl = document.getElementById("sceneOverlay");
-    const sceneCloseBtn = document.getElementById("sceneCloseBtn");
-    const sceneHeaderTitleEl = document.getElementById("sceneHeaderTitle");
-    const sceneHeaderSubEl = document.getElementById("sceneHeaderSub");
-    const sceneHeroBgEl = document.getElementById("sceneHeroBg");
-    const sceneLabelBadgeEl = document.getElementById("sceneLabelBadge");
-    const sceneLabelTimeEl = document.getElementById("sceneLabelTime");
-    const sceneTitleEl = document.getElementById("sceneTitle");
-    const sceneTextEl = document.getElementById("sceneText");
-    const sceneIndexInfoEl = document.getElementById("sceneIndexInfo");
-    const sceneAudioBtn = document.getElementById("sceneAudioBtn");
-    const sceneBodyEl = document.getElementById("sceneBody");
+    const daysContainerEl     = document.getElementById("daysContainer");
+    const sceneOverlayEl      = document.getElementById("sceneOverlay");
+    const sceneCloseBtn       = document.getElementById("sceneCloseBtn");
+    const sceneHeaderTitleEl  = document.getElementById("sceneHeaderTitle");
+    const sceneHeaderSubEl    = document.getElementById("sceneHeaderSub");
+    const sceneHeroBgEl       = document.getElementById("sceneHeroBg");
+    const sceneLabelBadgeEl   = document.getElementById("sceneLabelBadge");
+    const sceneLabelTimeEl    = document.getElementById("sceneLabelTime");
+    const sceneTitleEl        = document.getElementById("sceneTitle");
+    const sceneTextEl         = document.getElementById("sceneText");
+    const sceneIndexInfoEl    = document.getElementById("sceneIndexInfo");
+    const sceneAudioBtn       = document.getElementById("sceneAudioBtn");
+    const sceneBodyEl         = document.getElementById("sceneBody");
+    const sceneProgressBarEl  = document.getElementById("sceneProgressBar");
 
     let currentAudio = null;
     let currentDayIndex = null;
@@ -1050,7 +1150,11 @@
             <div class="moments-strip">
               ${day.moments
                 .map((m, idx) => {
-                  const bg = m.photo ? `background-image:url('${m.photo}')` : "";
+                  const lower = (m.photo || "").toLowerCase();
+                  const isVideo = lower.endsWith(".mp4") || lower.endsWith(".mov");
+                  const bg = !isVideo && m.photo
+                    ? `background-image:url('${m.photo}')`
+                    : (m.photo ? `background-image:url('${m.photo}')` : "");
                   return `
                     <article class="moment-chip" data-day-id="${day.id}" data-moment-index="${idx}" style="${bg}">
                       <div class="moment-chip-overlay"></div>
@@ -1062,6 +1166,11 @@
                           <span>${m.timeOfDay || "Instant"}</span>
                         </div>
                       </div>
+                      ${isVideo ? `
+                        <div class="moment-video-pill">
+                          <span>▶︎</span><span>Vidéo</span>
+                        </div>
+                      ` : ""}
                     </article>
                   `;
                 })
@@ -1116,7 +1225,7 @@
     }
 
     // ============================
-    //   SCÈNE IMMERSIVE + NAV IG
+    //   SCÈNE IMMERSIVE + NAV TYPE IG
     // ============================
 
     function renderCurrentScene() {
@@ -1127,19 +1236,32 @@
 
       // header
       sceneHeaderTitleEl.textContent = day.title;
-      sceneHeaderSubEl.textContent = `${day.location} • ${formatDate(day.date)}`;
+      sceneHeaderSubEl.textContent   = `${day.location} • ${formatDate(day.date)}`;
 
       // hero
-      sceneHeroBgEl.style.backgroundImage = moment.photo
-        ? `url('${moment.photo}')`
-        : "";
+      const lower = (moment.photo || "").toLowerCase();
+      const isVideo = lower.endsWith(".mp4") || lower.endsWith(".mov");
+
+      if (isVideo) {
+        // on affiche un poster "noir" avec un léger texte si tu veux, ou une image
+        sceneHeroBgEl.style.backgroundImage = "none";
+        sceneHeroBgEl.style.backgroundColor = "#000";
+      } else {
+        sceneHeroBgEl.style.backgroundColor = "transparent";
+        sceneHeroBgEl.style.backgroundImage = moment.photo ? `url('${moment.photo}')` : "";
+      }
+
       sceneLabelBadgeEl.textContent = moment.label;
-      sceneLabelTimeEl.textContent = moment.timeOfDay || "Instant";
+      sceneLabelTimeEl.textContent  = moment.timeOfDay || "Instant";
 
       // contenu
-      sceneTitleEl.textContent = moment.title;
-      sceneTextEl.textContent = moment.text;
+      sceneTitleEl.textContent   = moment.title;
+      sceneTextEl.textContent    = moment.text;
       sceneIndexInfoEl.textContent = `${currentMomentIndex + 1} / ${day.moments.length} instants`;
+
+      // progress bar
+      const ratio = (currentMomentIndex + 1) / day.moments.length;
+      sceneProgressBarEl.style.width = `${ratio * 100}%`;
 
       // audio
       if (currentAudio) {
@@ -1166,15 +1288,14 @@
         sceneAudioBtn.onclick = null;
       }
 
-      const body = sceneBodyEl;
-      body.scrollTo({ top: 0, behavior: "instant" });
+      sceneBodyEl.scrollTo({ top: 0, behavior: "instant" });
     }
 
     function openScene(dayId, momentIndex) {
       const dayIndex = voyageData.days.findIndex((d) => d.id === dayId);
       if (dayIndex === -1) return;
 
-      currentDayIndex = dayIndex;
+      currentDayIndex    = dayIndex;
       currentMomentIndex = momentIndex;
 
       renderCurrentScene();
@@ -1198,7 +1319,7 @@
         currentMomentIndex += 1;
         renderCurrentScene();
       } else {
-        // dernière scène → on ferme (comme si story terminée)
+        // dernière scène → on ferme (comme une story terminée)
         closeScene();
       }
     }
@@ -1209,7 +1330,6 @@
         currentMomentIndex -= 1;
         renderCurrentScene();
       }
-      // si on est déjà à 0, on ne fait rien (IG reste sur la première)
     }
 
     sceneCloseBtn.addEventListener("click", closeScene);
@@ -1219,19 +1339,16 @@
       }
     });
 
-    // 👉 Navigation type Instagram : tap gauche/droite
+    // 👉 Navigation type Instagram : tap gauche/droite dans la scène
     sceneBodyEl.addEventListener("click", (e) => {
-      // on ignore les clics sur les boutons (audio, close, etc.)
       if (e.target.closest("button") || e.target.closest("a")) return;
 
       const rect = sceneBodyEl.getBoundingClientRect();
       const x = e.clientX - rect.left;
 
       if (x > rect.width / 2) {
-        // droite → suivant
         goNextMoment();
       } else {
-        // gauche → précédent
         goPrevMoment();
       }
     });
@@ -1240,7 +1357,7 @@
     //   INTRO CTA
     // ============================
 
-    const introStartBtn = document.getElementById("introStartBtn");
+    const introStartBtn      = document.getElementById("introStartBtn");
     const introJumpSecondBtn = document.getElementById("introJumpSecondBtn");
 
     introStartBtn.addEventListener("click", () => {
